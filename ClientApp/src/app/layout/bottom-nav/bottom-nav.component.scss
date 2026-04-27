@@ -1,0 +1,38 @@
+:host {
+  display: none;
+}
+
+.bottom-nav {
+  position: sticky;
+  bottom: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  padding: 0.65rem;
+  border-radius: 22px;
+  background: rgba(255, 251, 244, 0.88);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 16px 34px rgba(23, 55, 79, 0.12);
+}
+
+.bottom-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 700;
+  color: #385066;
+}
+
+.bottom-nav a.is-active {
+  background: #17374f;
+  color: #fff8ef;
+}
+
+@media (max-width: 780px) {
+  :host {
+    display: block;
+  }
+}

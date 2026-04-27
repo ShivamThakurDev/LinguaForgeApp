@@ -1,0 +1,14 @@
+<section class="weak-card">
+  <p class="eyebrow">Focus Next</p>
+
+  <ng-container *ngIf="recommendation() as item; else empty">
+    <strong>{{ item.topic | titlecase }}</strong>
+    <p>{{ item.reason }}</p>
+    <small>{{ item.lessonKey }} · {{ item.suggestedExerciseType }}</small>
+  </ng-container>
+
+  <ng-template #empty>
+    <strong>No weak-topic signal yet</strong>
+    <p>Once you complete a few guided exercises, this card can surface your next focus area.</p>
+  </ng-template>
+</section>

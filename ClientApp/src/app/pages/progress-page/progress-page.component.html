@@ -1,0 +1,68 @@
+<section class="progress-hero glass-card">
+  <div>
+    <p class="eyebrow">Progress</p>
+    <h1>Your rhythm stays visible without becoming the whole app.</h1>
+    <p>XP, streaks, and badges stay celebratory here, while the main product stays focused on play.</p>
+  </div>
+
+  <a routerLink="/learn" class="hero-link">Return to learn</a>
+</section>
+
+<section class="progress-grid">
+  <article class="progress-card progress-card--primary glass-card">
+    <div class="xp-ring">
+      <span>{{ totalXp }}</span>
+      <small>Total XP</small>
+    </div>
+
+    <div class="progress-card__body">
+      <p class="eyebrow">Weekly momentum</p>
+      <h2>{{ weeklyXp }} XP this week</h2>
+      <p>
+        You are {{ nextMilestone - totalXp }} XP away from the next level reward. Progress updates
+        should animate smoothly here after each lesson.
+      </p>
+
+      <div class="milestone">
+        <div class="milestone__bar" aria-hidden="true">
+          <span [style.width.%]="(totalXp / nextMilestone) * 100"></span>
+        </div>
+        <strong>{{ totalXp }}/{{ nextMilestone }} XP to next chest</strong>
+      </div>
+    </div>
+  </article>
+
+  <article class="progress-card progress-card--accent">
+    <p class="eyebrow">Streak</p>
+    <h2>🔥 {{ streakDays }} days</h2>
+    <p>Make it easy to protect. One short lesson tomorrow should keep the chain alive.</p>
+  </article>
+
+  <article class="progress-card">
+    <p class="eyebrow">Badges</p>
+    <div class="badge-row">
+      <article *ngFor="let badge of badges" class="badge-card">
+        <span>{{ badge.icon }}</span>
+        <strong>{{ badge.name }}</strong>
+        <p>{{ badge.note }}</p>
+      </article>
+    </div>
+  </article>
+
+  <article class="progress-card progress-card--recommendation">
+    <p class="eyebrow">Focus next</p>
+    <h2>Articles sprint</h2>
+    <p>Return to the active grammar mission, then finish with the speaking step to bank a clean streak day.</p>
+    <div class="recommendation-tags">
+      <span>A1</span>
+      <span>Grammar</span>
+      <span>Speaking</span>
+    </div>
+  </article>
+
+  <article class="progress-card progress-card--mini">
+    <p class="eyebrow">Completed</p>
+    <h2>{{ lessonsCompleted }}</h2>
+    <p>Lessons finished so far. Lightweight recap, not another dashboard to maintain.</p>
+  </article>
+</section>

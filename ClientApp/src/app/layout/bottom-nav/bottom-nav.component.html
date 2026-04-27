@@ -1,0 +1,5 @@
+<nav class="bottom-nav" aria-label="Primary">
+  <a *ngFor="let item of items" [routerLink]="item.path" routerLinkActive="is-active">
+    {{ item.label }}
+  </a>
+</nav>

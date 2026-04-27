@@ -1,0 +1,36 @@
+.recommendation-card {
+  background: linear-gradient(135deg, #fffdf6, #eef8ff);
+  border: 1px solid #d8e2ea;
+  border-radius: 14px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  border-radius: 10px;
+  border: 1px solid #cdd7e0;
+  padding: 0.45rem 0.65rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meta span {
+  background: rgba(17, 134, 125, 0.1);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+}
+
+.error {
+  color: #c53030;
+}

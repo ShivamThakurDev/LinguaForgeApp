@@ -1,0 +1,152 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  color-scheme: light;
+  --font-display: 'Aptos Display', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-body: 'Aptos', 'Segoe UI', 'Trebuchet MS', sans-serif;
+  --surface-strong: rgba(255, 251, 245, 0.86);
+  --surface-soft: rgba(255, 255, 255, 0.7);
+  --surface-tint: rgba(232, 246, 242, 0.92);
+  --ink-strong: #13344a;
+  --ink-main: #24485a;
+  --ink-soft: #5d7380;
+  --line-soft: rgba(19, 52, 74, 0.08);
+  --brand-navy: #16374e;
+  --brand-green: #1b8d74;
+  --brand-lime: #8fd46d;
+  --brand-sun: #ffd682;
+  --brand-blue: #8fd0ff;
+  --success: #2baa68;
+  --danger: #ea6c63;
+  --shadow-card: 0 20px 60px rgba(33, 73, 72, 0.12);
+  --shadow-soft: 0 10px 24px rgba(33, 73, 72, 0.08);
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 214, 130, 0.55), transparent 24%),
+    radial-gradient(circle at top right, rgba(155, 214, 255, 0.34), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(145, 225, 182, 0.3), transparent 24%),
+    linear-gradient(180deg, #fbf4e6 0%, #eef8f6 52%, #edf4ff 100%);
+  color: var(--ink-main);
+  font-family: var(--font-body);
+}
+
+body button,
+body input,
+body select,
+body textarea {
+  font: inherit;
+}
+
+body button {
+  cursor: pointer;
+}
+
+body a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+button,
+a {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+button:hover,
+a:hover {
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(45, 166, 122, 0.28);
+  outline-offset: 2px;
+}
+
+.glass-card {
+  border: 1px solid var(--line-soft);
+  border-radius: 28px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(43, 170, 104, 0);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 10px rgba(43, 170, 104, 0.08);
+  }
+}
+
+@keyframes gentleFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes shakeX {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes rewardRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

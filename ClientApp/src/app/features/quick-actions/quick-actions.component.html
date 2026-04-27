@@ -1,0 +1,6 @@
+<section class="quick-actions">
+  <p class="eyebrow">Quick Actions</p>
+  <div class="action-list">
+    <a *ngFor="let action of actions" [routerLink]="action.route">{{ action.label }}</a>
+  </div>
+</section>

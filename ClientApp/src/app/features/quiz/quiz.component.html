@@ -1,0 +1,55 @@
+<section class="panel">
+  <header class="panel-header">
+    <h2>AI Quiz</h2>
+    <button (click)="generate()" [disabled]="isLoading()">{{ isLoading() ? 'Generating...' : 'Generate' }}</button>
+  </header>
+
+  <p *ngIf="!isAuthenticated()">Sign in above to generate and evaluate personalized quiz attempts.</p>
+
+  <div class="controls">
+    <label>Topic <input [ngModel]="topic()" (ngModelChange)="topic.set($event)" /></label>
+    <label>Level <input [ngModel]="level()" (ngModelChange)="level.set($event)" /></label>
+    <label>
+      Type
+      <select [ngModel]="exerciseType()" (ngModelChange)="exerciseType.set($event)">
+        <option value="mcq">MCQ</option>
+        <option value="fill-in">Fill-in</option>
+      </select>
+    </label>
+  </div>
+
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+
+  <article *ngIf="exercise() as item" class="quiz-card">
+    <h3>{{ item.question }}</h3>
+
+    <ng-container *ngIf="item.exerciseType !== 'fill-in'; else fillInMode">
+      <button
+        class="option"
+        *ngFor="let option of item.options"
+        [class.selected]="selectedOptionId() === option.id"
+        [class.correct]="submitted() && option.id === item.correctOptionId"
+        [class.wrong]="submitted() && selectedOptionId() === option.id && option.id !== item.correctOptionId"
+        (click)="selectedOptionId.set(option.id)">
+        {{ option.text }}
+      </button>
+    </ng-container>
+
+    <ng-template #fillInMode>
+      <input
+        class="fill-input"
+        [ngModel]="fillInAnswer()"
+        (ngModelChange)="fillInAnswer.set($event)"
+        placeholder="Type your German answer" />
+    </ng-template>
+
+    <button class="submit" (click)="submit()" [disabled]="submitted() || (!selectedOptionId() && !fillInAnswer()) || isLoading()">Submit</button>
+
+    <p *ngIf="submitted() && evaluation() as result" class="feedback">
+      {{ result.isCorrect ? 'Correct.' : 'Not quite.' }} {{ result.feedback }}
+    </p>
+
+    <small *ngIf="submitted() && evaluation()">Expected answer: {{ evaluation()!.correctedAnswer }}</small>
+    <small *ngIf="item.promptText">Tip: {{ item.promptText }}</small>
+  </article>
+</section>

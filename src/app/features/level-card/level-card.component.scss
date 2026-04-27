@@ -1,0 +1,56 @@
+.level-card {
+  display: grid;
+  gap: 1.4rem;
+  padding: 1.3rem;
+  border-radius: 24px;
+  color: #122638;
+  min-height: 220px;
+}
+
+.level-badge {
+  display: inline-flex;
+  margin-bottom: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(18, 38, 56, 0.08);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.55rem;
+}
+
+p {
+  max-width: 42ch;
+  line-height: 1.5;
+}
+
+a {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  background: rgba(18, 38, 56, 0.88);
+  color: #fff8f0;
+}
+
+.level-card--sunrise {
+  background: linear-gradient(160deg, #ffe8ca 0%, #ffd59a 100%);
+}
+
+.level-card--meadow {
+  background: linear-gradient(160deg, #dff4d1 0%, #c1e9b1 100%);
+}
+
+.level-card--ocean {
+  background: linear-gradient(160deg, #d8efff 0%, #acd8ff 100%);
+}
+
+.level-card--ember {
+  background: linear-gradient(160deg, #ffd9d0 0%, #ffb6a4 100%);
+}

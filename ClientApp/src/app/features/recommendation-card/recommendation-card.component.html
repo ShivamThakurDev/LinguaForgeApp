@@ -1,0 +1,19 @@
+<section class="recommendation-card">
+  <header>
+    <h2>Next recommendation</h2>
+    <button (click)="load()" [disabled]="isLoading()">Refresh</button>
+  </header>
+
+  <p *ngIf="!recommendation() && !error()">Sign in to get your personalized next drill.</p>
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+
+  <article *ngIf="recommendation() as item">
+    <strong>{{ item.topic | titlecase }}</strong>
+    <p>{{ item.reason }}</p>
+    <div class="meta">
+      <span>{{ item.level }}</span>
+      <span>{{ item.suggestedExerciseType }}</span>
+      <span>{{ item.lessonKey }}</span>
+    </div>
+  </article>
+</section>

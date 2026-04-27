@@ -1,0 +1,33 @@
+<section class="panel">
+  <header class="panel-header">
+    <h2>Pronunciation Feedback</h2>
+  </header>
+
+  <label>
+    Reference text
+    <input [ngModel]="referenceText()" (ngModelChange)="referenceText.set($event)" />
+  </label>
+
+  <div class="actions">
+    <button (click)="startRecording()" [disabled]="isRecording() || isAssessing()">Start</button>
+    <button (click)="stopRecording()" [disabled]="!isRecording()">Stop & Assess</button>
+    <span *ngIf="isAssessing()">Assessing...</span>
+  </div>
+
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+
+  <article *ngIf="result() as data" class="result">
+    <div class="score" *ngFor="let score of scoreBars()">
+      <div class="label-row">
+        <span>{{ score.label }}</span>
+        <strong>{{ score.value | number: '1.0-0' }}</strong>
+      </div>
+      <div class="track"><div class="fill" [style.width.%]="score.value"></div></div>
+    </div>
+
+    <h4>Phoneme scores</h4>
+    <div class="phonemes">
+      <span *ngFor="let phoneme of data.phonemes">{{ phoneme.phoneme }}: {{ phoneme.accuracyScore | number: '1.0-0' }}</span>
+    </div>
+  </article>
+</section>

@@ -1,0 +1,26 @@
+<section class="panel">
+  <header class="panel-header">
+    <h2>Progress Dashboard</h2>
+    <button (click)="loadProgress()" [disabled]="isLoading()">Refresh</button>
+  </header>
+
+  <p *ngIf="!progress() && !isLoading() && !error()">Sign in to sync XP, streaks, and badges.</p>
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+  <p *ngIf="isLoading()">Loading progress...</p>
+
+  <article *ngIf="progress() as p" class="stats">
+    <div><span>XP</span><strong>{{ p.totalXp }}</strong></div>
+    <div><span>Streak</span><strong>{{ p.currentStreakDays }} days</strong></div>
+    <div><span>Level</span><strong>{{ p.level }}</strong></div>
+  </article>
+
+  <canvas #heatmapCanvas aria-label="xp heatmap"></canvas>
+
+  <div *ngIf="progress() as p" class="badges">
+    <h4>Badges</h4>
+    <div class="badge" *ngFor="let badge of p.badges">
+      <strong>{{ badge.name }}</strong>
+      <span>{{ badge.description }}</span>
+    </div>
+  </div>
+</section>

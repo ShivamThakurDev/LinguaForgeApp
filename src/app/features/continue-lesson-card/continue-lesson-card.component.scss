@@ -1,0 +1,28 @@
+.continue-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.2rem;
+  border-radius: 22px;
+  background: linear-gradient(160deg, #17374f 0%, #17645d 100%);
+  color: #fff8ef;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+a {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  min-height: 2.7rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  color: #17374f;
+  background: #fff8ef;
+}

@@ -1,0 +1,29 @@
+.unit-preview {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.15rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fffaf2 0%, #f2e6d3 100%);
+}
+
+h3 {
+  color: #17374f;
+}
+
+p {
+  color: #536574;
+  line-height: 1.5;
+}
+
+a {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  min-height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  color: #fff8ef;
+  background: #17374f;
+}

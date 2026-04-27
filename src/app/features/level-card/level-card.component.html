@@ -1,0 +1,9 @@
+<article class="level-card" [class]="'level-card level-card--' + accent">
+  <div>
+    <span class="level-badge">{{ code }}</span>
+    <h3>{{ title }}</h3>
+    <p>{{ summary }}</p>
+  </div>
+
+  <a [routerLink]="['/learn', code]">Open {{ code }} map</a>
+</article>

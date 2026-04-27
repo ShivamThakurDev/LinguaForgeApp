@@ -1,0 +1,78 @@
+.panel {
+  padding: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+input,
+select,
+button {
+  border-radius: 8px;
+  border: 1px solid #d4d4d4;
+  padding: 0.45rem 0.55rem;
+}
+
+.quiz-card {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.option {
+  text-align: left;
+  background: #fdfdfd;
+}
+
+.fill-input {
+  border-radius: 8px;
+  border: 1px solid #d4d4d4;
+  padding: 0.55rem;
+}
+
+.option.selected {
+  border-color: #4583f7;
+}
+
+.option.correct {
+  border-color: #26a269;
+  background: #ebfaf2;
+}
+
+.option.wrong {
+  border-color: #d64545;
+  background: #fff2f2;
+}
+
+.feedback {
+  background: #f2f2ff;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+.error {
+  color: #c53030;
+}
+
+@media (max-width: 900px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}

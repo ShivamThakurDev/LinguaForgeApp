@@ -1,0 +1,150 @@
+<!-- src/app/features/translation/translation.component.html -->
+
+<div class="translator">
+
+  <!-- Header -->
+  <header class="translator__header">
+    <div class="header__brand">
+      <span class="brand__mark">L</span>
+      <span class="brand__name">LinguaForge</span>
+    </div>
+    <p class="header__tagline">Multilingual translation powered by Azure AI</p>
+  </header>
+
+  <!-- Language Bar -->
+  <div class="lang-bar">
+    <div class="lang-bar__select-wrap">
+      <label class="lang-bar__label">From</label>
+      <select
+        class="lang-bar__select"
+        [ngModel]="fromLang()"
+        (ngModelChange)="fromLang.set($event)">
+        <option value="">Auto-detect</option>
+        @for (lang of languages(); track lang.code) {
+          <option [value]="lang.code">{{ lang.name }}</option>
+        }
+      </select>
+    </div>
+
+    <button
+      class="lang-bar__swap"
+      [class.lang-bar__swap--spinning]="swapping()"
+      [disabled]="!fromLang() || fromLang() === toLang()"
+      (click)="swapLanguages()"
+      title="Swap languages">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 16V4m0 0L3 8m4-4l4 4"/>
+        <path d="M17 8v12m0 0l4-4m-4 4l-4-4"/>
+      </svg>
+    </button>
+
+    <div class="lang-bar__select-wrap">
+      <label class="lang-bar__label">To</label>
+      <select
+        class="lang-bar__select"
+        [ngModel]="toLang()"
+        (ngModelChange)="toLang.set($event)">
+        @for (lang of languages(); track lang.code) {
+          <option [value]="lang.code">{{ lang.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (langError()) {
+    <p class="notice notice--warn">{{ langError() }}</p>
+  }
+
+  <!-- Input / Output panels -->
+  <div class="panels">
+
+    <!-- Input panel -->
+    <div class="panel panel--input">
+      <textarea class="panel__text panel__text--input"
+                placeholder="Enter text to translate…"
+                maxlength="5000"
+                [ngModel]="inputText()"
+                (ngModelChange)="onInputChange($event)"
+                (keydown.meta.enter)="translate()"
+                (keydown.ctrl.enter)="translate()"></textarea>
+      <div class="panel__footer">
+        <span class="panel__charcount"
+              [class.panel__charcount--near]="charCount() > 4000">
+          {{ charCount() }} / 5000
+        </span>
+        @if (inputText()) {
+          <button class="panel__clear" (click)="clearAll()">Clear</button>
+        }
+      </div>
+    </div>
+
+    <!-- Output panel -->
+    <div class="panel panel--output" [class.panel--loading]="isLoading()">
+
+      @if (isLoading()) {
+        <div class="loader">
+          <span class="loader__dot"></span>
+          <span class="loader__dot"></span>
+          <span class="loader__dot"></span>
+        </div>
+      }
+
+      @if (errorMsg()) {
+        <div class="error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ errorMsg() }}
+        </div>
+      }
+
+      @if (result() && !isLoading()) {
+        <div class="result">
+          <p class="result__text">{{ result()!.translatedText }}</p>
+          <div class="result__meta">
+            @if (result()!.detectedSourceLanguage && fromLang() === '') {
+              <span class="meta__pill">
+                Detected: {{ result()!.detectedSourceLanguage }}
+              </span>
+            }
+            <span class="meta__pill">{{ result()!.languagePair }}</span>
+            <span class="meta__pill">{{ result()!.characterCount }} chars</span>
+          </div>
+        </div>
+      }
+
+      @if (!result() && !isLoading() && !errorMsg()) {
+        <p class="panel__placeholder">Translation will appear here</p>
+      }
+
+      @if (result()) {
+        <button class="panel__copy" (click)="copyResult()" title="Copy to clipboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Translate button -->
+  <div class="actions">
+    <button
+      class="btn-translate"
+      [disabled]="!canTranslate()"
+      (click)="translate()">
+      @if (isLoading()) { Translating… } @else { Translate }
+      <span class="btn-translate__hint">⌘↵</span>
+    </button>
+  </div>
+
+</div>

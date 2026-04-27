@@ -1,0 +1,51 @@
+<section class="map-header glass-card">
+  <div class="map-header__copy">
+    <p class="eyebrow">{{ level() }} Route</p>
+    <h1>{{ level() }} learning arc</h1>
+    <p>
+      Follow the vertical lane, finish the glowing lesson, and unlock the next grammar and speaking
+      challenge.
+    </p>
+  </div>
+
+  <div class="map-header__side">
+    <div class="map-stat">
+      <span>Completed</span>
+      <strong>{{ completedCount() }}</strong>
+    </div>
+    <div class="map-stat" *ngIf="currentLesson() as currentLesson">
+      <span>Current</span>
+      <strong>{{ currentLesson.title }}</strong>
+    </div>
+    <a routerLink="/learn" class="back-link">All levels</a>
+  </div>
+</section>
+
+<p class="state-message" *ngIf="isLoading()">Loading the {{ level() }} map...</p>
+<p class="state-message error" *ngIf="error()">{{ error() }}</p>
+
+<section class="map-board glass-card" *ngIf="!isLoading() && mapNodes().length > 0">
+  <header class="map-board__header">
+    <div>
+      <p class="eyebrow">Path View</p>
+      <h2>Tap the glowing node to keep moving.</h2>
+    </div>
+    <p>The map stays narrow on purpose so the next move is always obvious.</p>
+  </header>
+
+  <div *ngFor="let lesson of mapNodes(); let last = last" class="map-entry">
+    <div class="map-node__line" *ngIf="!last"></div>
+    <app-lesson-node
+      [lesson]="lesson"
+      [stepLabel]="lesson.stepLabel"
+      [lane]="lesson.lane"
+      [status]="lesson.status"
+      [xpReward]="lesson.xpReward"
+      [durationMinutes]="lesson.durationMinutes"></app-lesson-node>
+  </div>
+</section>
+
+<section class="empty-state glass-card" *ngIf="!isLoading() && !error() && mapNodes().length === 0">
+  <h2>No lessons yet for {{ level() }}</h2>
+  <p>Once lesson data exists for this level, it will appear here as a mapped sequence.</p>
+</section>

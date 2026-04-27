@@ -1,0 +1,41 @@
+<section class="panel">
+  <header class="panel-header">
+    <h2>Structured Lessons</h2>
+    <label>
+      Level
+      <select [ngModel]="selectedLevel()" (ngModelChange)="selectedLevel.set($event); loadLessons()">
+        <option *ngFor="let level of levels" [value]="level">{{ level }}</option>
+      </select>
+    </label>
+  </header>
+
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+  <p *ngIf="isLoading()">Loading lessons...</p>
+
+  <div class="lesson-grid" *ngIf="!isLoading() && lessons().length > 0">
+    <aside>
+      <button
+        *ngFor="let lesson of lessons()"
+        [class.active]="lesson.lessonKey === selectedLessonKey()"
+        (click)="pickLesson(lesson.lessonKey)">
+        <strong>{{ lesson.title }}</strong>
+        <span>{{ lesson.vocabulary.length }} words</span>
+      </button>
+    </aside>
+
+    <article *ngIf="selectedLesson() as lesson">
+      <h3>{{ lesson.title }}</h3>
+      <p>{{ lesson.description }}</p>
+
+      <div class="vocab-list">
+        <div class="vocab-item" *ngFor="let vocab of lesson.vocabulary">
+          <div>
+            <div class="de">{{ vocab.german }}</div>
+            <div class="en">{{ vocab.english }}</div>
+          </div>
+          <button (click)="playWord(vocab.german, vocab.audioUrl)">Play</button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

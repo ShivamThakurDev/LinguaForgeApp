@@ -1,0 +1,114 @@
+<section class="learn-hero glass-card">
+  <div class="learn-hero__copy">
+    <div class="hero-chips">
+      <span class="hero-chip">🔥 {{ streakDays }} day streak</span>
+      <span class="hero-chip">⭐ {{ totalXp }} XP</span>
+      <span class="hero-chip">Route: {{ activePath }}</span>
+    </div>
+
+    <p class="eyebrow">Daily German Quest</p>
+    <h1>Play one clear lesson and keep your momentum alive.</h1>
+    <p class="lede">
+      Structured vocabulary, grammar clarity, and speaking practice wrapped into a quick daily run.
+    </p>
+
+    <div class="hero-actions">
+      <a [routerLink]="continueRoute" class="continue-action">Continue Learning</a>
+      <a routerLink="/progress" class="quiet-action">See progress</a>
+    </div>
+  </div>
+
+  <aside class="hero-progress">
+    <div class="goal-card">
+      <span class="goal-card__label">Daily goal</span>
+      <strong>{{ dailyGoalCompleted }}/{{ dailyGoalTotal }} lessons</strong>
+      <div class="goal-meter" aria-hidden="true">
+        <span [style.width.%]="dailyGoalPercent"></span>
+      </div>
+      <p>One more lesson keeps the streak glowing.</p>
+    </div>
+
+    <a [routerLink]="['/learn', 'A1']" class="practice-mistakes">
+      Practice mistakes
+      <small>Target weak article patterns before they stack up.</small>
+    </a>
+  </aside>
+</section>
+
+<section class="path-section glass-card">
+  <header class="section-heading">
+    <div>
+      <p class="eyebrow">Lesson Path</p>
+      <h2>Your lane should feel like a climb, not a dashboard.</h2>
+    </div>
+    <a [routerLink]="['/learn', 'A1']" class="path-link">Open full path</a>
+  </header>
+
+  <div class="path-layout">
+    <article class="continue-card">
+      <p class="eyebrow">Primary Action</p>
+      <h3>Articles in action</h3>
+      <p>
+        Learn article patterns, answer a quick check, fill the blank, then finish with a speaking
+        challenge.
+      </p>
+
+      <dl class="continue-meta">
+        <div>
+          <dt>Run time</dt>
+          <dd>4 min</dd>
+        </div>
+        <div>
+          <dt>Reward</dt>
+          <dd>30 XP</dd>
+        </div>
+        <div>
+          <dt>Skill focus</dt>
+          <dd>der / die / das</dd>
+        </div>
+      </dl>
+
+      <a [routerLink]="continueRoute" class="continue-card__cta">Continue Learning</a>
+    </article>
+
+    <div class="path-preview" aria-label="Lesson path preview">
+      <article
+        *ngFor="let node of pathPreview; let index = index"
+        class="path-node"
+        [class.path-node--active]="node.status === 'active'"
+        [class.path-node--completed]="node.status === 'completed'"
+        [class.path-node--locked]="node.status === 'locked'">
+        <span class="path-node__rail" *ngIf="index < pathPreview.length - 1"></span>
+        <div class="path-node__badge">
+          <span *ngIf="node.status === 'completed'">✓</span>
+          <span *ngIf="node.status === 'active'">▶</span>
+          <span *ngIf="node.status === 'locked'">🔒</span>
+        </div>
+
+        <div class="path-node__body">
+          <p>{{ node.type }}</p>
+          <h3>{{ node.title }}</h3>
+          <strong>{{ node.xp }} XP</strong>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="levels-section">
+  <header class="section-heading">
+    <div>
+      <p class="eyebrow">Routes</p>
+      <h2>Choose a route when you want to change tempo, not when you need the next step.</h2>
+    </div>
+  </header>
+
+  <div class="level-grid">
+    <article *ngFor="let level of levels" class="level-card level-card--{{ level.accent }}">
+      <span class="level-code">{{ level.code }}</span>
+      <h3>{{ level.title }}</h3>
+      <p>{{ level.summary }}</p>
+      <a [routerLink]="['/learn', level.code]">Open {{ level.code }} map</a>
+    </article>
+  </div>
+</section>

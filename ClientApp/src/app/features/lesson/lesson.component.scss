@@ -1,0 +1,71 @@
+.panel {
+  padding: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1rem;
+}
+
+aside {
+  display: grid;
+  gap: 0.5rem;
+}
+
+aside button {
+  text-align: left;
+  border: 1px solid #d0d0d0;
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+aside button.active {
+  border-color: #22a37f;
+  background: #e7f7f1;
+}
+
+.vocab-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.vocab-item {
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.de {
+  font-weight: 700;
+}
+
+.en {
+  opacity: 0.8;
+}
+
+.error {
+  color: #c53030;
+}
+
+@media (max-width: 900px) {
+  .lesson-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,15 @@
+<header class="top-nav">
+  <a routerLink="/learn" class="brand-mark">
+    <span>LF</span>
+    <div>
+      <strong>LinguaForge</strong>
+      <small>German practice studio</small>
+    </div>
+  </a>
+
+  <nav class="top-nav__links">
+    <a *ngFor="let item of items" [routerLink]="item.path" routerLinkActive="is-active">
+      {{ item.label }}
+    </a>
+  </nav>
+</header>

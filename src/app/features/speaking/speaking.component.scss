@@ -1,0 +1,59 @@
+.panel {
+  padding: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+  display: grid;
+  gap: 0.8rem;
+}
+
+input,
+button {
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.result {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.track {
+  height: 8px;
+  background: #ececec;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3f86ff, #18b888);
+}
+
+.phonemes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.phonemes span {
+  background: #f3f3f3;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.error {
+  color: #c53030;
+}

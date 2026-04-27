@@ -1,0 +1,17 @@
+<section class="continue-card">
+  <p class="eyebrow">Continue</p>
+  <h3>Jump back into your next useful lesson.</h3>
+
+  <p *ngIf="isLoading()">Loading your next stop...</p>
+
+  <ng-container *ngIf="recommendation() as item; else fallback">
+    <strong>{{ item.topic | titlecase }}</strong>
+    <p>{{ item.reason }}</p>
+    <a [routerLink]="lessonRoute">Resume lesson</a>
+  </ng-container>
+
+  <ng-template #fallback>
+    <p>Open the A1 path and pick a unit to get moving.</p>
+    <a [routerLink]="lessonRoute">Start learning</a>
+  </ng-template>
+</section>

@@ -1,0 +1,42 @@
+<div class="map-node" [class.map-node--right]="lane === 'right'">
+  <article
+    class="lesson-node"
+    [class.lesson-node--active]="status === 'active'"
+    [class.lesson-node--completed]="status === 'completed'"
+    [class.lesson-node--locked]="status === 'locked'">
+    <div class="lesson-node__topline">
+      <span>{{ stepLabel }}</span>
+      <em>{{ xpReward }} XP</em>
+    </div>
+
+    <div class="lesson-node__main">
+      <div class="lesson-node__marker">
+        <span *ngIf="status === 'completed'">✓</span>
+        <span *ngIf="status === 'active'">▶</span>
+        <span *ngIf="status === 'locked'">🔒</span>
+      </div>
+
+      <div class="lesson-node__content">
+        <h2>{{ lesson.title }}</h2>
+        <p>{{ lesson.description }}</p>
+
+        <div class="lesson-node__meta">
+          <strong>{{ lesson.vocabulary.length }} vocab</strong>
+          <strong>{{ durationMinutes }} min</strong>
+          <code>{{ lesson.lessonKey }}</code>
+        </div>
+      </div>
+    </div>
+
+    <a
+      *ngIf="status !== 'locked'; else lockedCta"
+      [routerLink]="['/lesson-player', lesson.lessonKey]"
+      class="lesson-node__link">
+      {{ status === 'active' ? 'Continue' : 'Replay' }}
+    </a>
+
+    <ng-template #lockedCta>
+      <span class="lesson-node__lock-note">Finish the current lesson to unlock this stop.</span>
+    </ng-template>
+  </article>
+</div>

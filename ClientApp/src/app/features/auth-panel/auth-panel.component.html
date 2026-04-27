@@ -1,0 +1,40 @@
+<section class="auth-card">
+  <ng-container *ngIf="currentUser() as user; else authForm">
+    <div class="auth-card__signed-in">
+      <div>
+        <h2>{{ user.userName }}</h2>
+        <p>{{ user.email }}</p>
+      </div>
+      <button (click)="logout()">Log out</button>
+    </div>
+  </ng-container>
+
+  <ng-template #authForm>
+    <header class="auth-card__header">
+      <h2>{{ mode() === 'register' ? 'Create account' : 'Sign in' }}</h2>
+      <button type="button" (click)="mode.set(mode() === 'register' ? 'login' : 'register')">
+        {{ mode() === 'register' ? 'Have an account?' : 'Need an account?' }}
+      </button>
+    </header>
+
+    <label *ngIf="mode() === 'register'">
+      Name
+      <input [ngModel]="userName()" (ngModelChange)="userName.set($event)" />
+    </label>
+
+    <label>
+      Email
+      <input [ngModel]="email()" (ngModelChange)="email.set($event)" type="email" />
+    </label>
+
+    <label>
+      Password
+      <input [ngModel]="password()" (ngModelChange)="password.set($event)" type="password" />
+    </label>
+
+    <p class="error" *ngIf="error()">{{ error() }}</p>
+    <button class="primary" (click)="submit()" [disabled]="isLoading() || !email() || !password()">
+      {{ isLoading() ? 'Working...' : (mode() === 'register' ? 'Register' : 'Login') }}
+    </button>
+  </ng-template>
+</section>

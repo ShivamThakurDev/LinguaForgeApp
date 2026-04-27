@@ -1,0 +1,13 @@
+<section class="badges-card">
+  <p class="eyebrow">Badges</p>
+  <div class="badges-list" *ngIf="badges().length > 0; else empty">
+    <article *ngFor="let badge of badges()">
+      <strong>{{ badge.name }}</strong>
+      <p>{{ badge.description }}</p>
+    </article>
+  </div>
+
+  <ng-template #empty>
+    <p>No badges yet. Finish a lesson to unlock your first one.</p>
+  </ng-template>
+</section>

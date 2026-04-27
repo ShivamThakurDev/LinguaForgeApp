@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.shell-frame {
+  width: min(1180px, 92vw);
+  margin: 0 auto;
+  padding: 1.25rem 0 3rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.shell-main {
+  display: grid;
+  gap: 1.25rem;
+}

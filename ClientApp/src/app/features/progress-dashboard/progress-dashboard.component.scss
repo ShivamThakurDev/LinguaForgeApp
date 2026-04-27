@@ -1,0 +1,65 @@
+.panel {
+  padding: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.stats div {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  padding: 0.65rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.stats span {
+  opacity: 0.75;
+}
+
+.badges {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.badge {
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: grid;
+}
+
+.error {
+  color: #c53030;
+}
+
+canvas {
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 0.2rem;
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

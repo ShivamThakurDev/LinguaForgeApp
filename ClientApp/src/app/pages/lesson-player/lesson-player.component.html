@@ -1,0 +1,157 @@
+<section class="player-header glass-card">
+  <div>
+    <p class="eyebrow">Lesson Run</p>
+    <h1 *ngIf="lesson() as currentLesson">{{ currentLesson.title }}</h1>
+    <p *ngIf="lesson() as currentLesson">{{ currentLesson.description }}</p>
+  </div>
+
+  <div class="player-header__stats">
+    <div class="player-stat">
+      <span>Streak</span>
+      <strong>🔥 +1</strong>
+    </div>
+    <div class="player-stat">
+      <span>XP banked</span>
+      <strong>{{ earnedXp() }}</strong>
+    </div>
+    <a [routerLink]="['/learn', level()]" class="ghost-link">Back to map</a>
+  </div>
+</section>
+
+<p class="state-message" *ngIf="isLoading()">Loading lesson player...</p>
+<p class="state-message error" *ngIf="error()">{{ error() }}</p>
+<p class="state-message success" *ngIf="completionMessage()">{{ completionMessage() }}</p>
+
+<ng-container *ngIf="!isLoading() && lesson() as currentLesson">
+  <section class="player-progress glass-card">
+    <div class="player-progress__meta">
+      <div>
+        <p class="eyebrow">Progress</p>
+        <h2>{{ activeStep().title }}</h2>
+      </div>
+      <strong>{{ currentStepIndex() + 1 }}/{{ lessonSteps().length }}</strong>
+    </div>
+
+    <div class="player-progress__bar" aria-hidden="true">
+      <span [style.width.%]="progressPercent()"></span>
+    </div>
+    <p>{{ activeStep().helper }}</p>
+  </section>
+
+  <section
+    class="task-card glass-card"
+    [class.task-card--correct]="feedback() === 'correct'"
+    [class.task-card--incorrect]="feedback() === 'incorrect'">
+    <header class="task-card__header">
+      <div>
+        <p class="eyebrow">{{ activeStep().kind }}</p>
+        <h2>{{ activeStep().prompt }}</h2>
+      </div>
+      <span class="task-card__xp">+10 XP</span>
+    </header>
+
+    <ng-container [ngSwitch]="activeStep().kind">
+      <div *ngSwitchCase="'vocab'" class="vocab-step">
+        <article class="focus-vocab" *ngIf="currentWord() as currentWord">
+          <div>
+            <span>Target word</span>
+            <strong>{{ currentWord.german }}</strong>
+            <p>{{ currentWord.english }} · {{ currentWord.partOfSpeech }}</p>
+          </div>
+          <button type="button" (click)="playWord(currentWord.german, currentWord.audioUrl)">Play audio</button>
+        </article>
+
+        <div class="vocab-support">
+          <article *ngFor="let vocab of currentLesson.vocabulary">
+            <strong>{{ vocab.german }}</strong>
+            <p>{{ vocab.english }}</p>
+          </article>
+        </div>
+
+        <button type="button" class="primary-lesson-button" (click)="skipVocabStep()">I know these, continue</button>
+      </div>
+
+      <div *ngSwitchCase="'quiz'" class="choice-step">
+        <p class="prompt-card">Choose the correct article: <strong>___ Hund</strong></p>
+        <div class="choice-grid">
+          <button type="button" [class.is-selected]="selectedOption() === 'der'" (click)="submitQuizAnswer('der')">der</button>
+          <button type="button" [class.is-selected]="selectedOption() === 'die'" (click)="submitQuizAnswer('die')">die</button>
+          <button type="button" [class.is-selected]="selectedOption() === 'das'" (click)="submitQuizAnswer('das')">das</button>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'blank'" class="blank-step">
+        <p class="prompt-card">Fill in the blank: <strong>Der _____ ist freundlich.</strong></p>
+        <label class="answer-field">
+          <span>Your answer</span>
+          <input
+            type="text"
+            [value]="blankAnswer()"
+            (input)="blankAnswer.set(($any($event.target).value ?? '').toString())"
+            placeholder="Type the noun" />
+        </label>
+        <button type="button" class="primary-lesson-button" (click)="submitBlankAnswer()">Check answer</button>
+      </div>
+
+      <div *ngSwitchCase="'speaking'" class="speaking-step">
+        <div class="speaking-prompt">
+          <span>Say aloud</span>
+          <strong>Guten Morgen, wie geht es dir?</strong>
+          <p>Keep the sentence smooth and clear. Speaking AI can plug into this panel later.</p>
+        </div>
+
+        <div class="speaking-actions">
+          <button type="button" (click)="playWord('Guten Morgen, wie geht es dir?')">Listen first</button>
+          <button type="button" class="primary-lesson-button" (click)="assessSpeaking()">I said it clearly</button>
+        </div>
+
+        <div class="speaking-score" *ngIf="speakingReady()">
+          <span>Confidence score</span>
+          <strong>{{ speakingScore() }}</strong>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'reward'" class="reward-step">
+        <div class="reward-burst">
+          <span>+{{ earnedXp() + 10 }}</span>
+        </div>
+        <h3>Lesson complete</h3>
+        <p>You kept the streak alive, cleared the grammar checkpoint, and unlocked the next route node.</p>
+
+        <div class="reward-grid">
+          <article>
+            <span>XP earned</span>
+            <strong>{{ earnedXp() + 10 }}</strong>
+          </article>
+          <article>
+            <span>Streak</span>
+            <strong>13 days</strong>
+          </article>
+          <article>
+            <span>Badge progress</span>
+            <strong>Grammar Spark</strong>
+          </article>
+        </div>
+
+        <button type="button" class="primary-lesson-button" (click)="continueFromFeedback()" [disabled]="isCompleting()">
+          {{ isCompleting() ? 'Saving reward...' : 'Claim reward' }}
+        </button>
+      </div>
+    </ng-container>
+
+    <section class="feedback-panel" *ngIf="feedback() !== 'idle' && activeStep().kind !== 'reward'">
+      <div class="feedback-panel__icon">
+        <span *ngIf="feedback() === 'correct'">✓</span>
+        <span *ngIf="feedback() === 'incorrect'">!</span>
+      </div>
+      <div>
+        <strong>{{ feedback() === 'correct' ? 'Correct' : 'Try again' }}</strong>
+        <p>{{ feedbackMessage() }}</p>
+      </div>
+
+      <button type="button" class="feedback-panel__button" [disabled]="feedback() === 'incorrect'" (click)="continueFromFeedback()">
+        {{ feedback() === 'correct' ? 'Next step' : 'Retry' }}
+      </button>
+    </section>
+  </section>
+</ng-container>

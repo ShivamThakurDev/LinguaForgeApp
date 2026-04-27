@@ -1,0 +1,18 @@
+.weak-card {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.15rem;
+  border-radius: 22px;
+  background: linear-gradient(160deg, #d8efff 0%, #acd8ff 100%);
+  color: #17374f;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+}
+
+small {
+  color: #426173;
+}
