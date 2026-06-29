@@ -1,0 +1,55 @@
+# Local full-stack: SQL Server + .NET API + Angular SSR frontend.
+# Usage:  JWT_KEY="$(openssl rand -base64 48)" DB_PASSWORD='Your_strong_passw0rd!' docker compose up --build
+# Secrets are passed via environment variables, never committed.
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD:-Your_strong_passw0rd!}"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: LinguaForge.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=LinguaForge;User Id=sa;Password=${DB_PASSWORD:-Your_strong_passw0rd!};TrustServerCertificate=True"
+      # Must be >= 32 bytes or the app refuses to start (boot guard). Override in real deploys.
+      Jwt__Key: "${JWT_KEY:-local-dev-only-signing-key-change-me-32b+}"
+      Jwt__Issuer: "LinguaForge"
+      Jwt__Audience: "LinguaForge"
+      Cors__AllowedOrigins__0: "http://localhost:4000"
+      # Azure keys are optional locally; the metered features stay unused without them.
+      AzureOpenAI__ApiKey: "${AZURE_OPENAI_KEY:-}"
+      AzureSpeech__ApiKey: "${AZURE_SPEECH_KEY:-}"
+      AzureTranslator__ApiKey: "${AZURE_TRANSLATOR_KEY:-}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: "4000"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - api
+
+volumes:
+  mssql-data:
