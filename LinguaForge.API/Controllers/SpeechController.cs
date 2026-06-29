@@ -1,12 +1,16 @@
 using LinguaForge.Application.DTOs;
 using LinguaForge.Application.UseCaseServices;
 using LinguaForge.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LinguaForge.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [EnableRateLimiting("MeteredApi")]
     public class SpeechController : ControllerBase
     {
         private readonly SpeechAppService _speechAppService;

@@ -60,6 +60,27 @@ namespace LinguaForge.Infrastructure.Services
             var user = await GetOrCreateUserAsync(request.UserId, cancellationToken);
             await EnsureStarterBadgesAsync(cancellationToken);
 
+            // XP and accuracy are derived from server-graded attempts, never from the
+            // client request. Counting DISTINCT correct exercises means retrying an
+            // exercise cannot farm extra XP. Lessons with no exercises still grant a
+            // small base reward for completion.
+            var totalExercises = await _dbContext.Exercises
+                .CountAsync(x => x.LessonKey == request.LessonKey, cancellationToken);
+
+            var correctExerciseCount = await _dbContext.QuizAttempts
+                .Where(x => x.UserId == user.Id
+                    && x.LessonKey == request.LessonKey
+                    && x.IsCorrect
+                    && x.ExerciseId != null)
+                .Select(x => x.ExerciseId)
+                .Distinct()
+                .CountAsync(cancellationToken);
+
+            var earnedXp = Math.Max(10, correctExerciseCount * 10);
+            var accuracyPercent = totalExercises > 0
+                ? (int)Math.Round(100.0 * correctExerciseCount / totalExercises)
+                : 100;
+
             var progress = await _dbContext.LessonProgresses
                 .SingleOrDefaultAsync(x => x.UserId == user.Id && x.LessonKey == request.LessonKey, cancellationToken);
 
@@ -72,27 +93,32 @@ namespace LinguaForge.Infrastructure.Services
                     LessonTitle = request.LessonTitle,
                     Attempts = 1,
                     IsCompleted = true,
-                    AccuracyPercent = request.AccuracyPercent,
-                    EarnedXp = request.EarnedXp,
+                    AccuracyPercent = accuracyPercent,
+                    EarnedXp = earnedXp,
                     UpdatedAtUtc = DateTime.UtcNow
                 };
                 _dbContext.LessonProgresses.Add(progress);
-                user.TotalXp += request.EarnedXp;
+                user.TotalXp += earnedXp;
             }
             else
             {
                 progress.Attempts += 1;
                 progress.IsCompleted = true;
-                progress.AccuracyPercent = request.AccuracyPercent;
-                progress.EarnedXp = request.EarnedXp;
+                progress.AccuracyPercent = accuracyPercent;
+                progress.EarnedXp = earnedXp;
                 progress.UpdatedAtUtc = DateTime.UtcNow;
-                user.TotalXp += Math.Max(0, request.EarnedXp / 2);
+                user.TotalXp += Math.Max(0, earnedXp / 2);
             }
 
             UpdateStreak(user);
-            user.Level = Math.Clamp((user.TotalXp / 100) + 1, 1, 50);
+
+            // Persist the completion BEFORE evaluating badges: UnlockBadgesAsync counts
+            // completed lessons from the database, so the just-finished lesson must be
+            // saved first or the first-lesson badge would never unlock on lesson one.
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             await UnlockBadgesAsync(user, cancellationToken);
+            user.Level = Math.Clamp((user.TotalXp / 100) + 1, 1, 50);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return await GetProgressAsync(user.Id, cancellationToken);

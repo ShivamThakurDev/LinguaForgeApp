@@ -29,7 +29,7 @@
         <p class="eyebrow">Progress</p>
         <h2>{{ activeStep().title }}</h2>
       </div>
-      <strong>{{ currentStepIndex() + 1 }}/{{ lessonSteps().length }}</strong>
+      <strong>{{ currentStepIndex() + 1 }}/{{ steps().length }}</strong>
     </div>
 
     <div class="player-progress__bar" aria-hidden="true">
@@ -45,12 +45,13 @@
     <header class="task-card__header">
       <div>
         <p class="eyebrow">{{ activeStep().kind }}</p>
-        <h2>{{ activeStep().prompt }}</h2>
+        <h2 *ngIf="activeExercise() as exercise">{{ exercise.promptText }}</h2>
+        <h2 *ngIf="!activeExercise()">{{ activeStep().title }}</h2>
       </div>
-      <span class="task-card__xp">+10 XP</span>
     </header>
 
     <ng-container [ngSwitch]="activeStep().kind">
+      <!-- Vocabulary preview -->
       <div *ngSwitchCase="'vocab'" class="vocab-step">
         <article class="focus-vocab" *ngIf="currentWord() as currentWord">
           <div>
@@ -71,65 +72,78 @@
         <button type="button" class="primary-lesson-button" (click)="skipVocabStep()">I know these, continue</button>
       </div>
 
-      <div *ngSwitchCase="'quiz'" class="choice-step">
-        <p class="prompt-card">Choose the correct article: <strong>___ Hund</strong></p>
-        <div class="choice-grid">
-          <button type="button" [class.is-selected]="selectedOption() === 'der'" (click)="submitQuizAnswer('der')">der</button>
-          <button type="button" [class.is-selected]="selectedOption() === 'die'" (click)="submitQuizAnswer('die')">die</button>
-          <button type="button" [class.is-selected]="selectedOption() === 'das'" (click)="submitQuizAnswer('das')">das</button>
-        </div>
+      <!-- Server-graded exercise (mcq or blank) -->
+      <div *ngSwitchCase="'exercise'" class="choice-step">
+        <ng-container *ngIf="activeExercise() as exercise">
+          <p class="prompt-card"><strong>{{ exercise.question }}</strong></p>
+
+          <div *ngIf="exercise.type === 'mcq'" class="choice-grid">
+            <button
+              type="button"
+              *ngFor="let option of exercise.options"
+              [class.is-selected]="selectedOption() === option"
+              [disabled]="isSubmitting() || feedback() === 'correct'"
+              (click)="selectOption(option)">
+              {{ option }}
+            </button>
+          </div>
+
+          <div *ngIf="exercise.type === 'blank'" class="blank-step">
+            <label class="answer-field">
+              <span>Your answer</span>
+              <input
+                type="text"
+                [value]="blankAnswer()"
+                [disabled]="isSubmitting() || feedback() === 'correct'"
+                (input)="blankAnswer.set(($any($event.target).value ?? '').toString())"
+                (keyup.enter)="submitBlank()"
+                placeholder="Type the German" />
+            </label>
+            <button
+              type="button"
+              class="primary-lesson-button"
+              [disabled]="isSubmitting() || feedback() === 'correct' || !blankAnswer().trim()"
+              (click)="submitBlank()">
+              {{ isSubmitting() ? 'Checking…' : 'Check answer' }}
+            </button>
+          </div>
+        </ng-container>
       </div>
 
-      <div *ngSwitchCase="'blank'" class="blank-step">
-        <p class="prompt-card">Fill in the blank: <strong>Der _____ ist freundlich.</strong></p>
-        <label class="answer-field">
-          <span>Your answer</span>
-          <input
-            type="text"
-            [value]="blankAnswer()"
-            (input)="blankAnswer.set(($any($event.target).value ?? '').toString())"
-            placeholder="Type the noun" />
-        </label>
-        <button type="button" class="primary-lesson-button" (click)="submitBlankAnswer()">Check answer</button>
-      </div>
-
+      <!-- Speaking -->
       <div *ngSwitchCase="'speaking'" class="speaking-step">
         <div class="speaking-prompt">
           <span>Say aloud</span>
-          <strong>Guten Morgen, wie geht es dir?</strong>
+          <strong>{{ speakingPhrase() }}</strong>
           <p>Keep the sentence smooth and clear. Speaking AI can plug into this panel later.</p>
         </div>
 
         <div class="speaking-actions">
-          <button type="button" (click)="playWord('Guten Morgen, wie geht es dir?')">Listen first</button>
+          <button type="button" (click)="playWord(speakingPhrase())">Listen first</button>
           <button type="button" class="primary-lesson-button" (click)="assessSpeaking()">I said it clearly</button>
-        </div>
-
-        <div class="speaking-score" *ngIf="speakingReady()">
-          <span>Confidence score</span>
-          <strong>{{ speakingScore() }}</strong>
         </div>
       </div>
 
+      <!-- Reward -->
       <div *ngSwitchCase="'reward'" class="reward-step">
         <div class="reward-burst">
-          <span>+{{ earnedXp() + 10 }}</span>
+          <span>+{{ earnedXp() }}</span>
         </div>
         <h3>Lesson complete</h3>
-        <p>You kept the streak alive, cleared the grammar checkpoint, and unlocked the next route node.</p>
+        <p>You cleared the challenges and kept your streak alive. XP is calculated on the server.</p>
 
         <div class="reward-grid">
           <article>
             <span>XP earned</span>
-            <strong>{{ earnedXp() + 10 }}</strong>
+            <strong>{{ earnedXp() }}</strong>
           </article>
           <article>
             <span>Streak</span>
-            <strong>13 days</strong>
+            <strong>🔥 +1</strong>
           </article>
           <article>
-            <span>Badge progress</span>
-            <strong>Grammar Spark</strong>
+            <span>Words practiced</span>
+            <strong>{{ currentLesson.vocabulary.length }}</strong>
           </article>
         </div>
 
@@ -139,6 +153,7 @@
       </div>
     </ng-container>
 
+    <!-- Feedback (not shown on the reward step) -->
     <section class="feedback-panel" *ngIf="feedback() !== 'idle' && activeStep().kind !== 'reward'">
       <div class="feedback-panel__icon">
         <span *ngIf="feedback() === 'correct'">✓</span>
@@ -149,8 +164,19 @@
         <p>{{ feedbackMessage() }}</p>
       </div>
 
-      <button type="button" class="feedback-panel__button" [disabled]="feedback() === 'incorrect'" (click)="continueFromFeedback()">
-        {{ feedback() === 'correct' ? 'Next step' : 'Retry' }}
+      <button
+        type="button"
+        class="feedback-panel__button"
+        *ngIf="feedback() === 'correct'"
+        (click)="continueFromFeedback()">
+        Next step
+      </button>
+      <button
+        type="button"
+        class="feedback-panel__button"
+        *ngIf="feedback() === 'incorrect' && activeStep().kind === 'exercise'"
+        (click)="retry()">
+        Retry
       </button>
     </section>
   </section>

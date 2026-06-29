@@ -1,11 +1,15 @@
 using LinguaForge.Application.DTOs;
 using LinguaForge.Application.UseCaseServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LinguaForge.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [EnableRateLimiting("MeteredApi")]
     public class AiController : ControllerBase
     {
         private readonly AiChatAppService _chatService;

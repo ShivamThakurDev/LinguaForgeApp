@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ProgressService } from '../../core/services/progress.service';
+import { LearningSyncService } from '../../core/services/learning-sync.service';
 
 interface LevelEntry {
   code: string;
@@ -24,11 +27,16 @@ interface PathPreviewNode {
   styleUrl: './learn-home.component.scss',
 })
 export class LearnHomeComponent {
-  protected readonly streakDays = 12;
+  private readonly authService = inject(AuthService);
+  private readonly progressService = inject(ProgressService);
+  private readonly learningSync = inject(LearningSyncService);
+
+  // Real values for signed-in learners; sensible zero-state for guests.
+  protected readonly streakDays = signal(0);
+  protected readonly totalXp = signal(0);
   protected readonly dailyGoalCompleted = 2;
   protected readonly dailyGoalTotal = 5;
   protected readonly dailyGoalPercent = Math.round((this.dailyGoalCompleted / this.dailyGoalTotal) * 100);
-  protected readonly totalXp = 1840;
   protected readonly activePath = 'A1 Starter Trail';
   protected readonly continueRoute = ['/learn', 'A1', 'a1-articles'];
 
@@ -38,6 +46,29 @@ export class LearnHomeComponent {
     { title: 'Daily routine phrases', type: 'speaking drill', status: 'locked', xp: 35 },
     { title: 'Question builder', type: 'pattern unlock', status: 'locked', xp: 40 },
   ];
+
+  constructor() {
+    // Pull live XP/streak for signed-in learners and refresh after each lesson.
+    effect(() => {
+      this.learningSync.refreshTick();
+
+      if (!this.authService.currentUser()) {
+        this.streakDays.set(0);
+        this.totalXp.set(0);
+        return;
+      }
+
+      this.progressService.getProgress().subscribe({
+        next: (progress) => {
+          this.streakDays.set(progress.currentStreakDays);
+          this.totalXp.set(progress.totalXp);
+        },
+        error: () => {
+          // Leave the zero-state on failure rather than blocking the page.
+        },
+      });
+    });
+  }
 
   protected readonly levels: LevelEntry[] = [
     {

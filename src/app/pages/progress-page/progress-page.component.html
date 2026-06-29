@@ -8,61 +8,72 @@
   <a routerLink="/learn" class="hero-link">Return to learn</a>
 </section>
 
-<section class="progress-grid">
-  <article class="progress-card progress-card--primary glass-card">
-    <div class="xp-ring">
-      <span>{{ totalXp }}</span>
-      <small>Total XP</small>
-    </div>
-
-    <div class="progress-card__body">
-      <p class="eyebrow">Weekly momentum</p>
-      <h2>{{ weeklyXp }} XP this week</h2>
-      <p>
-        You are {{ nextMilestone - totalXp }} XP away from the next level reward. Progress updates
-        should animate smoothly here after each lesson.
-      </p>
-
-      <div class="milestone">
-        <div class="milestone__bar" aria-hidden="true">
-          <span [style.width.%]="(totalXp / nextMilestone) * 100"></span>
-        </div>
-        <strong>{{ totalXp }}/{{ nextMilestone }} XP to next chest</strong>
+@if (isLoading()) {
+  <section class="progress-grid">
+    <article class="progress-card glass-card">
+      <p class="eyebrow">Loading</p>
+      <h2>Fetching your progress…</h2>
+    </article>
+  </section>
+} @else if (error()) {
+  <section class="progress-grid">
+    <article class="progress-card glass-card">
+      <p class="eyebrow">Something went wrong</p>
+      <h2>{{ error() }}</h2>
+      <a routerLink="/learn" class="hero-link">Back to learning</a>
+    </article>
+  </section>
+} @else {
+  <section class="progress-grid">
+    <article class="progress-card progress-card--primary glass-card">
+      <div class="xp-ring">
+        <span>{{ totalXp() }}</span>
+        <small>Total XP</small>
       </div>
-    </div>
-  </article>
 
-  <article class="progress-card progress-card--accent">
-    <p class="eyebrow">Streak</p>
-    <h2>🔥 {{ streakDays }} days</h2>
-    <p>Make it easy to protect. One short lesson tomorrow should keep the chain alive.</p>
-  </article>
+      <div class="progress-card__body">
+        <p class="eyebrow">Weekly momentum</p>
+        <h2>{{ weeklyXp() }} XP this week</h2>
+        <p>
+          You are {{ nextMilestone() - totalXp() }} XP away from the next reward.
+        </p>
 
-  <article class="progress-card">
-    <p class="eyebrow">Badges</p>
-    <div class="badge-row">
-      <article *ngFor="let badge of badges" class="badge-card">
-        <span>{{ badge.icon }}</span>
-        <strong>{{ badge.name }}</strong>
-        <p>{{ badge.note }}</p>
-      </article>
-    </div>
-  </article>
+        <div class="milestone">
+          <div class="milestone__bar" aria-hidden="true">
+            <span [style.width.%]="milestonePercent()"></span>
+          </div>
+          <strong>{{ totalXp() }}/{{ nextMilestone() }} XP to next chest</strong>
+        </div>
+      </div>
+    </article>
 
-  <article class="progress-card progress-card--recommendation">
-    <p class="eyebrow">Focus next</p>
-    <h2>Articles sprint</h2>
-    <p>Return to the active grammar mission, then finish with the speaking step to bank a clean streak day.</p>
-    <div class="recommendation-tags">
-      <span>A1</span>
-      <span>Grammar</span>
-      <span>Speaking</span>
-    </div>
-  </article>
+    <article class="progress-card progress-card--accent">
+      <p class="eyebrow">Streak</p>
+      <h2>🔥 {{ streakDays() }} {{ streakDays() === 1 ? 'day' : 'days' }}</h2>
+      <p>Make it easy to protect. One short lesson tomorrow keeps the chain alive.</p>
+    </article>
 
-  <article class="progress-card progress-card--mini">
-    <p class="eyebrow">Completed</p>
-    <h2>{{ lessonsCompleted }}</h2>
-    <p>Lessons finished so far. Lightweight recap, not another dashboard to maintain.</p>
-  </article>
-</section>
+    <article class="progress-card progress-card--mini">
+      <p class="eyebrow">Level</p>
+      <h2>{{ level() }}</h2>
+      <p>Keep completing lessons to climb to the next level.</p>
+    </article>
+
+    <article class="progress-card">
+      <p class="eyebrow">Badges</p>
+      @if (badges().length) {
+        <div class="badge-row">
+          @for (badge of badges(); track badge.code) {
+            <article class="badge-card">
+              <span>🏅</span>
+              <strong>{{ badge.name }}</strong>
+              <p>{{ badge.description }}</p>
+            </article>
+          }
+        </div>
+      } @else {
+        <p>No badges yet — finish your first lesson to unlock one.</p>
+      }
+    </article>
+  </section>
+}
