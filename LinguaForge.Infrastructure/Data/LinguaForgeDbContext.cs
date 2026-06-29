@@ -12,6 +12,7 @@ namespace LinguaForge.Infrastructure.Data
         public DbSet<Translation> Translations => Set<Translation>();
         public DbSet<User> Users => Set<User>();
         public DbSet<AuthCredential> AuthCredentials => Set<AuthCredential>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<LessonProgress> LessonProgresses => Set<LessonProgress>();
         public DbSet<QuizAttempt> QuizAttempts => Set<QuizAttempt>();
         public DbSet<WeakTopic> WeakTopics => Set<WeakTopic>();
@@ -20,6 +21,7 @@ namespace LinguaForge.Infrastructure.Data
         public DbSet<Exercise> Exercises => Set<Exercise>();
         public DbSet<Badge> Badges => Set<Badge>();
         public DbSet<UserBadge> UserBadges => Set<UserBadge>();
+        public DbSet<XpEvent> XpEvents => Set<XpEvent>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -115,6 +117,28 @@ namespace LinguaForge.Infrastructure.Data
                 entity.Property(x => x.Explanation).HasMaxLength(400);
                 entity.Property(x => x.Topic).HasMaxLength(80);
                 entity.HasIndex(x => new { x.CefrLevel, x.LessonKey, x.Order });
+            });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.HasIndex(x => x.TokenHash).IsUnique();
+                entity.Property(x => x.TokenHash).HasMaxLength(100);
+                entity.HasOne(x => x.User)
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<XpEvent>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                // Idempotency: a given (user, reason, source) can award XP at most once.
+                entity.HasIndex(x => new { x.UserId, x.Reason, x.SourceId }).IsUnique();
+                entity.HasOne(x => x.User)
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Badge>(entity =>

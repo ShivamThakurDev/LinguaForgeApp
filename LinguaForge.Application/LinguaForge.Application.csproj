@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Clean architecture: Application orchestrates Domain (Domain references nothing). -->
+    <ProjectReference Include="..\LinguaForge.Domain\LinguaForge.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

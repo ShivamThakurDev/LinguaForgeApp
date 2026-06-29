@@ -93,7 +93,6 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<AuthAppService>();
 builder.Services.AddScoped<TranslationAppService>();
 builder.Services.AddScoped<SpeechAppService>();
-builder.Services.AddScoped<QuizAppService>();
 builder.Services.AddScoped<AiChatAppService>();
 builder.Services.AddScoped<RecommendationAppService>();
 builder.Services.AddScoped<UserProgressAppService>();

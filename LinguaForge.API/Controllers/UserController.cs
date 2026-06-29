@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace LinguaForge.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase
@@ -46,8 +46,7 @@ namespace LinguaForge.API.Controllers
                 return BadRequest(new { error = "lessonKey is required." });
             }
 
-            request.UserId = userId;
-            var progress = await _progressService.RecordCompletionAsync(request, cancellationToken);
+            var progress = await _progressService.RecordCompletionAsync(userId, request.LessonKey, cancellationToken);
             return Ok(progress);
         }
     }

@@ -7,6 +7,11 @@ namespace LinguaForge.Infrastructure.Configuration
         public string Key { get; set; } = string.Empty;
         public string Issuer { get; set; } = "LinguaForge.Api";
         public string Audience { get; set; } = "LinguaForge.Client";
-        public int ExpiryMinutes { get; set; } = 180;
+
+        /// <summary>Access-token lifetime. Short by design; refresh tokens cover longevity.</summary>
+        public int ExpiryMinutes { get; set; } = 15;
+
+        /// <summary>Refresh-token lifetime in days.</summary>
+        public int RefreshTokenDays { get; set; } = 30;
     }
 }

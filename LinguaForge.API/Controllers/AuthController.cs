@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace LinguaForge.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -57,6 +57,32 @@ namespace LinguaForge.API.Controllers
             {
                 return Unauthorized(new { error = ex.Message });
             }
+        }
+
+        // Anonymous: the access token is expired by the time this is called; the refresh
+        // token in the body is the credential.
+        [HttpPost("refresh")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await _authAppService.RefreshAsync(request.RefreshToken, cancellationToken);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request, CancellationToken cancellationToken)
+        {
+            await _authAppService.LogoutAsync(request.RefreshToken, cancellationToken);
+            return NoContent();
         }
 
         [Authorize]

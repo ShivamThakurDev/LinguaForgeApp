@@ -117,6 +117,8 @@ export interface AuthUser {
 export interface AuthResponse {
   token: string;
   expiresAtUtc: string;
+  refreshToken: string;
+  refreshTokenExpiresAtUtc: string;
   user: AuthUser;
 }
 

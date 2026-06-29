@@ -5,10 +5,8 @@ import { environment } from '../../../enviornment/environment';
 import { UserProgress } from '../../shared/models/learning.models';
 
 export interface CompleteLessonPayload {
+  // The client only names the lesson; XP/accuracy/title are computed server-side.
   lessonKey: string;
-  lessonTitle: string;
-  accuracyPercent: number;
-  earnedXp: number;
 }
 
 @Injectable({ providedIn: 'root' })

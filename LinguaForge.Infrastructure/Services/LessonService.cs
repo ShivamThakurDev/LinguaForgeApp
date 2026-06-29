@@ -10,10 +10,12 @@ namespace LinguaForge.Infrastructure.Services
     public class LessonService : ILessonService
     {
         private readonly LinguaForgeDbContext _dbContext;
+        private readonly IUserProgressService _userProgressService;
 
-        public LessonService(LinguaForgeDbContext dbContext)
+        public LessonService(LinguaForgeDbContext dbContext, IUserProgressService userProgressService)
         {
             _dbContext = dbContext;
+            _userProgressService = userProgressService;
         }
 
         public async Task<IReadOnlyList<LessonDto>> GetLessonsAsync(string level, CancellationToken cancellationToken = default)
@@ -102,12 +104,16 @@ namespace LinguaForge.Infrastructure.Services
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
+            // Grant XP for the FIRST correct answer only. The ledger's idempotency key
+            // (user, ExerciseFirstCorrect, exerciseId) makes retries award 0 — no farming.
+            var awardedXp = isCorrect
+                ? await _userProgressService.AwardXpAsync(userId, exercise.XpReward, XpReason.ExerciseFirstCorrect, exercise.Id, cancellationToken)
+                : 0;
+
             return new SubmitAnswerResultDto
             {
                 IsCorrect = isCorrect,
-                // Informational only — actual XP is granted server-side at lesson completion
-                // based on distinct correct exercises, so retries can't farm XP.
-                EarnedXp = isCorrect ? exercise.XpReward : 0,
+                EarnedXp = awardedXp,
                 CorrectAnswer = exercise.CorrectAnswer,
                 Explanation = exercise.Explanation
             };
