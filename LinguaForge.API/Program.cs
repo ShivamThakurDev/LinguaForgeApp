@@ -47,22 +47,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.Configure<AzureSpeechOptions>(builder.Configuration.GetSection(AzureSpeechOptions.SectionName));
 builder.Services.Configure<AzureOpenAIOptions>(builder.Configuration.GetSection(AzureOpenAIOptions.SectionName));
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<LoginThrottleOptions>(builder.Configuration.GetSection(LoginThrottleOptions.SectionName));
 
 builder.Services.AddDbContext<LinguaForgeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 
-// Fail fast: never boot with a missing, default, or weak signing key.
-// A short/known key lets anyone forge tokens and bypass every [Authorize] endpoint.
-if (string.IsNullOrWhiteSpace(jwtOptions.Key)
-    || jwtOptions.Key.Contains("CHANGE_ME", StringComparison.OrdinalIgnoreCase)
-    || Encoding.UTF8.GetByteCount(jwtOptions.Key) < 32)
-{
-    throw new InvalidOperationException(
-        "Jwt:Key is missing, still set to the placeholder, or shorter than 32 bytes. " +
-        "Set a long random secret via user-secrets (dev) or environment variables / Key Vault (prod) before starting.");
-}
+// Fail fast: never boot with a missing, default, or weak signing key. A short/known key
+// lets anyone forge tokens and bypass every [Authorize] endpoint. (see JwtKeyGuard, LF-101)
+JwtKeyGuard.Validate(jwtOptions.Key);
 
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key));
 
@@ -90,6 +84,10 @@ builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IUserProgressService, UserProgressService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 
+// Login brute-force throttle: in-memory failure counters per IP+email. (LF-105)
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ILoginThrottle, LoginThrottle>();
+
 builder.Services.AddScoped<AuthAppService>();
 builder.Services.AddScoped<TranslationAppService>();
 builder.Services.AddScoped<SpeechAppService>();
@@ -111,7 +109,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngular", policy =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
-              .AllowAnyHeader());
+              .AllowAnyHeader()
+              // Required so the browser will send the HttpOnly refresh cookie on /auth calls
+              // (SPA must use withCredentials). Safe here because origins are explicitly
+              // allow-listed above — credentials + AllowAnyOrigin is what would be unsafe. (LF-103)
+              .AllowCredentials());
 });
 
 // Per-user (or per-IP when anonymous) limit on the metered Azure endpoints
@@ -144,8 +146,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+// Skip DB migrate/seed under the integration-test host, which has no SQL Server. (LF-102)
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<LinguaForgeDbContext>();
     await DbBootstrapper.InitializeAsync(db);
     await ContentSeeder.SeedAsync(db);
@@ -153,9 +157,15 @@ using (var scope = app.Services.CreateScope())
 
 app.UseCors("AllowAngular");
 app.UseHttpsRedirection();
-app.UseRateLimiter();
+// Authentication MUST run before the rate limiter so the "MeteredApi" policy can partition by
+// the authenticated user id; otherwise the partition key is empty and it silently degrades to
+// per-IP throttling on the billable endpoints. (LF-102)
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 app.MapHealthChecks("/health");
 app.Run();
+
+// Exposed so integration tests can bootstrap the app via WebApplicationFactory<Program>. (LF-100)
+public partial class Program { }

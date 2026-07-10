@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.12" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
@@ -19,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LinguaForge.API\LinguaForge.API.csproj" />
     <ProjectReference Include="..\LinguaForge.Application\LinguaForge.Application.csproj" />
     <ProjectReference Include="..\LinguaForge.Domain\LinguaForge.Domain.csproj" />
     <ProjectReference Include="..\LinguaForge.Infrastructure\LinguaForge.Infrastructure.csproj" />

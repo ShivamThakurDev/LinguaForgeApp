@@ -24,12 +24,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       return authService.refresh().pipe(
-        switchMap((response) => next(withToken(req, response.token))),
+        // A refresh failure means the session is truly gone — log out and redirect.
+        // This catch is placed BEFORE the retry so a transient error on the RETRIED
+        // request surfaces on its own and does NOT eject an authenticated user. (LF-104 / LF-601)
         catchError((refreshError: unknown) => {
           authService.logout();
           void router.navigateByUrl('/welcome');
           return throwError(() => refreshError);
         }),
+        switchMap((response) => next(withToken(req, response.token))),
       );
     }),
   );

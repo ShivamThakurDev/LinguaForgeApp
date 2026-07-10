@@ -117,8 +117,8 @@ export interface AuthUser {
 export interface AuthResponse {
   token: string;
   expiresAtUtc: string;
-  refreshToken: string;
-  refreshTokenExpiresAtUtc: string;
+  // The refresh token is delivered as an HttpOnly cookie (LF-103) — it is intentionally not
+  // part of the JSON body and must never be read or stored by JavaScript.
   user: AuthUser;
 }
 
