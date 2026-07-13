@@ -1,11 +1,11 @@
 namespace LinguaForge.Application.DTOs
 {
+    /// <summary>
+    /// The client only names the lesson it finished. Identity comes from the JWT and
+    /// XP/accuracy/title are computed server-side, so none of those are accepted here.
+    /// </summary>
     public class CompleteLessonRequestDto
     {
-        public Guid UserId { get; set; }
         public string LessonKey { get; set; } = string.Empty;
-        public string LessonTitle { get; set; } = string.Empty;
-        public int AccuracyPercent { get; set; }
-        public int EarnedXp { get; set; } = 10;
     }
 }

@@ -18,6 +18,12 @@ namespace LinguaForge.Application.UseCaseServices
         public Task<AuthResponseDto> LoginAsync(AuthLoginRequestDto request, CancellationToken cancellationToken = default)
             => _authService.LoginAsync(request, cancellationToken);
 
+        public Task<AuthResponseDto> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default)
+            => _authService.RefreshAsync(refreshToken, cancellationToken);
+
+        public Task LogoutAsync(string refreshToken, CancellationToken cancellationToken = default)
+            => _authService.LogoutAsync(refreshToken, cancellationToken);
+
         public Task<AuthUserDto?> GetUserAsync(Guid userId, CancellationToken cancellationToken = default)
             => _authService.GetUserAsync(userId, cancellationToken);
     }

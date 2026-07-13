@@ -1,0 +1,108 @@
+{
+  "level": "A1",
+  "lessons": [
+    {
+      "lessonKey": "a1-greetings",
+      "order": 1,
+      "title": "Greetings",
+      "description": "Say hello, thank you, and goodbye.",
+      "vocabulary": [
+        { "german": "Guten Morgen", "english": "Good morning", "partOfSpeech": "phrase" },
+        { "german": "Danke", "english": "Thank you", "partOfSpeech": "interjection" },
+        { "german": "Hallo", "english": "Hello", "partOfSpeech": "interjection" },
+        { "german": "Tschüss", "english": "Bye", "partOfSpeech": "interjection" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Pick the correct translation", "question": "How do you say \"Thank you\"?", "options": ["Danke", "Bitte", "Hallo", "Tschüss"], "correctAnswer": "Danke", "explanation": "\"Danke\" means \"thank you\".", "topic": "greetings", "xpReward": 10 },
+        { "order": 2, "type": "blank", "promptText": "Type the German for this phrase", "question": "Good morning", "options": [], "correctAnswer": "Guten Morgen", "explanation": "\"Good morning\" is \"Guten Morgen\".", "topic": "greetings", "xpReward": 10 },
+        { "order": 3, "type": "mcq", "promptText": "Pick the correct translation", "question": "How do you say \"Hello\"?", "options": ["Tschüss", "Hallo", "Danke", "Bitte"], "correctAnswer": "Hallo", "explanation": "\"Hallo\" means \"hello\".", "topic": "greetings", "xpReward": 10 }
+      ]
+    },
+    {
+      "lessonKey": "a1-articles",
+      "order": 2,
+      "title": "Articles",
+      "description": "Master der, die, and das.",
+      "vocabulary": [
+        { "german": "der Hund", "english": "the dog", "partOfSpeech": "noun" },
+        { "german": "die Katze", "english": "the cat", "partOfSpeech": "noun" },
+        { "german": "der Tisch", "english": "the table", "partOfSpeech": "noun" },
+        { "german": "die Lampe", "english": "the lamp", "partOfSpeech": "noun" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Choose the correct article", "question": "___ Hund", "options": ["der", "die", "das"], "correctAnswer": "der", "explanation": "\"Hund\" is masculine, so it takes \"der\".", "topic": "articles", "xpReward": 10 },
+        { "order": 2, "type": "mcq", "promptText": "Choose the correct article", "question": "___ Katze", "options": ["der", "die", "das"], "correctAnswer": "die", "explanation": "\"Katze\" is feminine, so it takes \"die\".", "topic": "articles", "xpReward": 10 },
+        { "order": 3, "type": "blank", "promptText": "Type the German for this word", "question": "the dog", "options": [], "correctAnswer": "der Hund", "explanation": "\"the dog\" is \"der Hund\".", "topic": "vocabulary", "xpReward": 10 }
+      ]
+    },
+    {
+      "lessonKey": "a1-numbers",
+      "order": 3,
+      "title": "Numbers 1–5",
+      "description": "Count from one to five.",
+      "vocabulary": [
+        { "german": "eins", "english": "one", "partOfSpeech": "number" },
+        { "german": "zwei", "english": "two", "partOfSpeech": "number" },
+        { "german": "drei", "english": "three", "partOfSpeech": "number" },
+        { "german": "vier", "english": "four", "partOfSpeech": "number" },
+        { "german": "fünf", "english": "five", "partOfSpeech": "number" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Pick the correct number", "question": "Which word means \"three\"?", "options": ["zwei", "drei", "vier", "fünf"], "correctAnswer": "drei", "explanation": "\"drei\" means \"three\".", "topic": "numbers", "xpReward": 10 },
+        { "order": 2, "type": "blank", "promptText": "Type the German for this number", "question": "one", "options": [], "correctAnswer": "eins", "explanation": "\"one\" is \"eins\".", "topic": "numbers", "xpReward": 10 },
+        { "order": 3, "type": "blank", "promptText": "Type the German for this number", "question": "five", "options": [], "correctAnswer": "fünf", "explanation": "\"five\" is \"fünf\".", "topic": "numbers", "xpReward": 10 }
+      ]
+    },
+    {
+      "lessonKey": "a1-colors",
+      "order": 4,
+      "title": "Colors",
+      "description": "Name everyday colors.",
+      "vocabulary": [
+        { "german": "rot", "english": "red", "partOfSpeech": "adjective" },
+        { "german": "blau", "english": "blue", "partOfSpeech": "adjective" },
+        { "german": "grün", "english": "green", "partOfSpeech": "adjective" },
+        { "german": "gelb", "english": "yellow", "partOfSpeech": "adjective" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Pick the correct color", "question": "Which word means \"red\"?", "options": ["blau", "rot", "grün", "gelb"], "correctAnswer": "rot", "explanation": "\"rot\" means \"red\".", "topic": "colors", "xpReward": 10 },
+        { "order": 2, "type": "blank", "promptText": "Type the German for this color", "question": "blue", "options": [], "correctAnswer": "blau", "explanation": "\"blue\" is \"blau\".", "topic": "colors", "xpReward": 10 },
+        { "order": 3, "type": "mcq", "promptText": "Pick the correct color", "question": "Which word means \"green\"?", "options": ["gelb", "blau", "grün", "rot"], "correctAnswer": "grün", "explanation": "\"grün\" means \"green\".", "topic": "colors", "xpReward": 10 }
+      ]
+    },
+    {
+      "lessonKey": "a1-family",
+      "order": 5,
+      "title": "Family",
+      "description": "Talk about close family.",
+      "vocabulary": [
+        { "german": "die Mutter", "english": "the mother", "partOfSpeech": "noun" },
+        { "german": "der Vater", "english": "the father", "partOfSpeech": "noun" },
+        { "german": "die Schwester", "english": "the sister", "partOfSpeech": "noun" },
+        { "german": "der Bruder", "english": "the brother", "partOfSpeech": "noun" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Choose the correct article", "question": "___ Mutter", "options": ["der", "die", "das"], "correctAnswer": "die", "explanation": "\"Mutter\" is feminine: die Mutter.", "topic": "family", "xpReward": 10 },
+        { "order": 2, "type": "blank", "promptText": "Type the German for this word", "question": "the father", "options": [], "correctAnswer": "der Vater", "explanation": "\"the father\" is \"der Vater\".", "topic": "family", "xpReward": 10 },
+        { "order": 3, "type": "mcq", "promptText": "Pick the correct translation", "question": "Which word means \"the brother\"?", "options": ["die Schwester", "der Bruder", "die Mutter", "der Vater"], "correctAnswer": "der Bruder", "explanation": "\"the brother\" is \"der Bruder\".", "topic": "family", "xpReward": 10 }
+      ]
+    },
+    {
+      "lessonKey": "a1-food",
+      "order": 6,
+      "title": "Food & Drink",
+      "description": "Order basic food and drinks.",
+      "vocabulary": [
+        { "german": "das Wasser", "english": "the water", "partOfSpeech": "noun" },
+        { "german": "das Brot", "english": "the bread", "partOfSpeech": "noun" },
+        { "german": "der Kaffee", "english": "the coffee", "partOfSpeech": "noun" },
+        { "german": "der Apfel", "english": "the apple", "partOfSpeech": "noun" }
+      ],
+      "exercises": [
+        { "order": 1, "type": "mcq", "promptText": "Choose the correct article", "question": "___ Wasser", "options": ["der", "die", "das"], "correctAnswer": "das", "explanation": "\"Wasser\" is neuter: das Wasser.", "topic": "food", "xpReward": 10 },
+        { "order": 2, "type": "blank", "promptText": "Type the German for this word", "question": "the bread", "options": [], "correctAnswer": "das Brot", "explanation": "\"the bread\" is \"das Brot\".", "topic": "food", "xpReward": 10 },
+        { "order": 3, "type": "mcq", "promptText": "Pick the correct translation", "question": "Which word means \"the coffee\"?", "options": ["der Apfel", "der Kaffee", "das Brot", "das Wasser"], "correctAnswer": "der Kaffee", "explanation": "\"the coffee\" is \"der Kaffee\".", "topic": "food", "xpReward": 10 }
+      ]
+    }
+  ]
+}

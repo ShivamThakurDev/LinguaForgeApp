@@ -14,5 +14,8 @@ namespace LinguaForge.Application.UseCaseServices
 
         public Task<IReadOnlyList<LessonDto>> GetLessonsAsync(string level, CancellationToken cancellationToken = default)
             => _lessonService.GetLessonsAsync(level, cancellationToken);
+
+        public Task<SubmitAnswerResultDto?> EvaluateAnswerAsync(Guid userId, SubmitAnswerRequestDto request, CancellationToken cancellationToken = default)
+            => _lessonService.EvaluateAnswerAsync(userId, request, cancellationToken);
     }
 }

@@ -23,16 +23,9 @@ export class LessonPlayerService {
   }
 
   completeLesson(lesson: Lesson): Observable<unknown> {
-    const accuracyPercent = Math.min(100, 65 + lesson.vocabulary.length * 3);
-    const earnedXp = Math.max(20, lesson.vocabulary.length * 5);
-
+    // Server computes XP/accuracy from graded attempts; the client only names the lesson.
     return this.progressService
-      .completeLesson({
-        lessonKey: lesson.lessonKey,
-        lessonTitle: lesson.title,
-        accuracyPercent,
-        earnedXp,
-      })
+      .completeLesson({ lessonKey: lesson.lessonKey })
       .pipe(tap(() => this.learningSyncService.notifyUpdate()));
   }
 }

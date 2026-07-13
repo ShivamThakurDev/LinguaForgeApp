@@ -60,7 +60,7 @@ export class LessonMapComponent {
 
     this.lessonService.getLessons(level).subscribe({
       next: (lessons) => this.lessons.set(lessons),
-      error: (err: unknown) => this.error.set(`Failed to load ${level} lessons: ${String(err)}`),
+      error: () => this.error.set(`We could not load the ${level} lessons. Please try again in a moment.`),
       complete: () => this.isLoading.set(false),
     });
   }

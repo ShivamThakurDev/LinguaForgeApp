@@ -7,5 +7,6 @@ namespace LinguaForge.Application.DTOs
         public string Level { get; set; } = "A1";
         public string Description { get; set; } = string.Empty;
         public IReadOnlyList<LessonVocabDto> Vocabulary { get; set; } = Array.Empty<LessonVocabDto>();
+        public IReadOnlyList<LessonExerciseDto> Exercises { get; set; } = Array.Empty<LessonExerciseDto>();
     }
 }

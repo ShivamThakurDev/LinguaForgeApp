@@ -1,0 +1,36 @@
+<section class="welcome">
+  <header class="welcome__hero">
+    <p class="welcome__eyebrow">LinguaForge</p>
+    <h1 class="welcome__title">Learn German, five minutes a day.</h1>
+    <p class="welcome__subtitle">
+      Short lessons, instant feedback, and a streak worth protecting.
+    </p>
+  </header>
+
+  <div class="welcome__goals">
+    <p class="welcome__step">1 · What is your goal?</p>
+    <div class="welcome__goal-grid">
+      @for (goal of goals; track goal.code) {
+        <button
+          type="button"
+          class="welcome__goal"
+          [class.welcome__goal--active]="selectedGoal() === goal.code"
+          (click)="pickGoal(goal.code)"
+        >
+          <span class="welcome__goal-emoji">{{ goal.emoji }}</span>
+          <span class="welcome__goal-title">{{ goal.title }}</span>
+          <span class="welcome__goal-blurb">{{ goal.blurb }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="welcome__auth">
+    <p class="welcome__step">2 · Save your progress</p>
+    <app-auth-panel></app-auth-panel>
+  </div>
+
+  <p class="welcome__skip">
+    Just looking? <a routerLink="/learn">Explore lessons first</a>
+  </p>
+</section>

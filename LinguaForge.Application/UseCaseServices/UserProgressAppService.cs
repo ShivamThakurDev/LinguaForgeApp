@@ -15,7 +15,7 @@ namespace LinguaForge.Application.UseCaseServices
         public Task<UserProgressDto> GetProgressAsync(Guid userId, CancellationToken cancellationToken = default)
             => _userProgressService.GetProgressAsync(userId, cancellationToken);
 
-        public Task<UserProgressDto> RecordCompletionAsync(CompleteLessonRequestDto request, CancellationToken cancellationToken = default)
-            => _userProgressService.RecordLessonCompletionAsync(request, cancellationToken);
+        public Task<UserProgressDto> RecordCompletionAsync(Guid userId, string lessonKey, CancellationToken cancellationToken = default)
+            => _userProgressService.RecordLessonCompletionAsync(userId, lessonKey, cancellationToken);
     }
 }

@@ -5,12 +5,34 @@ export interface LessonVocab {
   audioUrl?: string | null;
 }
 
+export interface LessonExercise {
+  id: string;
+  type: 'mcq' | 'blank';
+  promptText: string;
+  question: string;
+  options: string[];
+  topic: string;
+}
+
 export interface Lesson {
   lessonKey: string;
   title: string;
   level: string;
   description: string;
   vocabulary: LessonVocab[];
+  exercises: LessonExercise[];
+}
+
+export interface SubmitAnswerRequest {
+  exerciseId: string;
+  submittedAnswer: string;
+}
+
+export interface SubmitAnswerResult {
+  isCorrect: boolean;
+  earnedXp: number;
+  correctAnswer: string;
+  explanation: string;
 }
 
 export interface QuizOption {
@@ -95,6 +117,8 @@ export interface AuthUser {
 export interface AuthResponse {
   token: string;
   expiresAtUtc: string;
+  // The refresh token is delivered as an HttpOnly cookie (LF-103) — it is intentionally not
+  // part of the JSON body and must never be read or stored by JavaScript.
   user: AuthUser;
 }
 

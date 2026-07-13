@@ -1,0 +1,13 @@
+# Keep build contexts small and avoid leaking local secrets/artifacts into images.
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/.git
+**/.vscode
+**/*.user
+**/appsettings.json
+**/appsettings.Development.json
+**/.env
+**/npm-debug.log
+**/.angular

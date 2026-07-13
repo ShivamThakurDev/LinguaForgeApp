@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using LinguaForge.Application.DTOs;
 using LinguaForge.Application.Interface;
 using LinguaForge.Domain.Entities;
@@ -8,6 +10,8 @@ namespace LinguaForge.Infrastructure.Services
 {
     public class UserProgressService : IUserProgressService
     {
+        private const int LessonCompletionBonusXp = 10;
+
         private readonly LinguaForgeDbContext _dbContext;
 
         public UserProgressService(LinguaForgeDbContext dbContext)
@@ -26,13 +30,14 @@ namespace LinguaForge.Infrastructure.Services
                 .OrderByDescending(x => x.UnlockedAtUtc)
                 .ToListAsync(cancellationToken);
 
-            var heatmap = await _dbContext.LessonProgresses
-                .Where(x => x.UserId == user.Id && x.IsCompleted)
-                .GroupBy(x => DateOnly.FromDateTime(x.UpdatedAtUtc.Date))
+            // Heatmap is derived from the XP ledger — the single source of XP truth.
+            var heatmap = await _dbContext.XpEvents
+                .Where(x => x.UserId == user.Id)
+                .GroupBy(x => DateOnly.FromDateTime(x.CreatedAtUtc.Date))
                 .Select(group => new HeatmapPointDto
                 {
                     Date = group.Key,
-                    Xp = group.Sum(x => x.EarnedXp)
+                    Xp = group.Sum(x => x.Amount)
                 })
                 .OrderBy(x => x.Date)
                 .Take(60)
@@ -55,62 +60,97 @@ namespace LinguaForge.Infrastructure.Services
             };
         }
 
-        public async Task<UserProgressDto> RecordLessonCompletionAsync(CompleteLessonRequestDto request, CancellationToken cancellationToken = default)
+        public async Task<UserProgressDto> RecordLessonCompletionAsync(Guid userId, string lessonKey, CancellationToken cancellationToken = default)
         {
-            var user = await GetOrCreateUserAsync(request.UserId, cancellationToken);
+            var user = await GetOrCreateUserAsync(userId, cancellationToken);
             await EnsureStarterBadgesAsync(cancellationToken);
 
+            // Title comes from the content, never the client.
+            var lesson = await _dbContext.Lessons.SingleOrDefaultAsync(x => x.LessonKey == lessonKey, cancellationToken);
+            var lessonTitle = lesson?.Title ?? lessonKey.Replace("-", " ");
+
+            // Accuracy is derived from server-graded attempts (display only).
+            var totalExercises = await _dbContext.Exercises.CountAsync(x => x.LessonKey == lessonKey, cancellationToken);
+            var correctExerciseCount = await _dbContext.QuizAttempts
+                .Where(x => x.UserId == user.Id && x.LessonKey == lessonKey && x.IsCorrect && x.ExerciseId != null)
+                .Select(x => x.ExerciseId)
+                .Distinct()
+                .CountAsync(cancellationToken);
+            var accuracyPercent = totalExercises > 0
+                ? (int)Math.Round(100.0 * correctExerciseCount / totalExercises)
+                : 100;
+
             var progress = await _dbContext.LessonProgresses
-                .SingleOrDefaultAsync(x => x.UserId == user.Id && x.LessonKey == request.LessonKey, cancellationToken);
+                .SingleOrDefaultAsync(x => x.UserId == user.Id && x.LessonKey == lessonKey, cancellationToken);
 
             if (progress is null)
             {
                 progress = new LessonProgress
                 {
                     UserId = user.Id,
-                    LessonKey = request.LessonKey,
-                    LessonTitle = request.LessonTitle,
+                    LessonKey = lessonKey,
+                    LessonTitle = lessonTitle,
                     Attempts = 1,
                     IsCompleted = true,
-                    AccuracyPercent = request.AccuracyPercent,
-                    EarnedXp = request.EarnedXp,
+                    AccuracyPercent = accuracyPercent,
                     UpdatedAtUtc = DateTime.UtcNow
                 };
                 _dbContext.LessonProgresses.Add(progress);
-                user.TotalXp += request.EarnedXp;
             }
             else
             {
                 progress.Attempts += 1;
                 progress.IsCompleted = true;
-                progress.AccuracyPercent = request.AccuracyPercent;
-                progress.EarnedXp = request.EarnedXp;
+                progress.AccuracyPercent = accuracyPercent;
+                progress.LessonTitle = lessonTitle;
                 progress.UpdatedAtUtc = DateTime.UtcNow;
-                user.TotalXp += Math.Max(0, request.EarnedXp / 2);
             }
 
             UpdateStreak(user);
-            user.Level = Math.Clamp((user.TotalXp / 100) + 1, 1, 50);
 
-            await UnlockBadgesAsync(user, cancellationToken);
+            // Persist the completion before evaluating badges so UnlockBadgesAsync (which
+            // counts completed lessons from the DB) sees this lesson.
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // Completion bonus — idempotent per lesson, so re-completing awards nothing.
+            await AwardXpAsync(user.Id, LessonCompletionBonusXp, XpReason.LessonCompletion, DeterministicGuid(lessonKey), cancellationToken);
+            await UnlockBadgesAsync(user, cancellationToken);
 
             return await GetProgressAsync(user.Id, cancellationToken);
         }
 
-        public async Task<UserProgressDto> AwardQuizXpAsync(Guid userId, int earnedXp, CancellationToken cancellationToken = default)
+        public async Task<int> AwardXpAsync(Guid userId, int amount, XpReason reason, Guid sourceId, CancellationToken cancellationToken = default)
         {
-            var user = await GetOrCreateUserAsync(userId, cancellationToken);
-            await EnsureStarterBadgesAsync(cancellationToken);
+            if (amount <= 0)
+            {
+                return 0;
+            }
 
-            user.TotalXp += Math.Max(0, earnedXp);
-            UpdateStreak(user);
+            var user = await GetOrCreateUserAsync(userId, cancellationToken);
+
+            // Idempotency: this (user, reason, source) may only ever award XP once. The
+            // unique DB index is the hard guarantee; this check avoids the common-case throw.
+            var alreadyGranted = await _dbContext.XpEvents
+                .AnyAsync(x => x.UserId == user.Id && x.Reason == reason && x.SourceId == sourceId, cancellationToken);
+            if (alreadyGranted)
+            {
+                return 0;
+            }
+
+            _dbContext.XpEvents.Add(new XpEvent
+            {
+                UserId = user.Id,
+                Amount = amount,
+                Reason = reason,
+                SourceId = sourceId,
+                CreatedAtUtc = DateTime.UtcNow
+            });
+
+            user.TotalXp += amount;
             user.Level = Math.Clamp((user.TotalXp / 100) + 1, 1, 50);
 
-            await UnlockBadgesAsync(user, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return await GetProgressAsync(user.Id, cancellationToken);
+            return amount;
         }
 
         private async Task<User> GetOrCreateUserAsync(Guid userId, CancellationToken cancellationToken)
@@ -180,13 +220,19 @@ namespace LinguaForge.Infrastructure.Services
             var completedCount = await _dbContext.LessonProgresses.CountAsync(x => x.UserId == user.Id && x.IsCompleted, cancellationToken);
             var existing = await _dbContext.UserBadges.Where(x => x.UserId == user.Id).Select(x => x.BadgeId).ToListAsync(cancellationToken);
             var badges = await _dbContext.Badges.ToListAsync(cancellationToken);
+            var learnedWordCount = await _dbContext.VocabItems.CountAsync(cancellationToken);
 
-            void Unlock(string code)
+            var earnedCodes = new List<string>();
+            if (completedCount >= 1) earnedCodes.Add("first_lesson");
+            if (user.CurrentStreakDays >= 7) earnedCodes.Add("seven_day_streak");
+            if (learnedWordCount >= 100) earnedCodes.Add("hundred_words");
+
+            foreach (var code in earnedCodes)
             {
                 var badge = badges.SingleOrDefault(x => x.Code == code);
                 if (badge is null || existing.Contains(badge.Id))
                 {
-                    return;
+                    continue;
                 }
 
                 _dbContext.UserBadges.Add(new UserBadge
@@ -195,24 +241,18 @@ namespace LinguaForge.Infrastructure.Services
                     BadgeId = badge.Id,
                     UnlockedAtUtc = DateTime.UtcNow
                 });
-                user.TotalXp += badge.BonusXp;
-            }
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (completedCount >= 1)
-            {
-                Unlock("first_lesson");
+                // Badge bonus flows through the same idempotent ledger as all other XP.
+                await AwardXpAsync(user.Id, badge.BonusXp, XpReason.BadgeBonus, badge.Id, cancellationToken);
             }
+        }
 
-            if (user.CurrentStreakDays >= 7)
-            {
-                Unlock("seven_day_streak");
-            }
-
-            var learnedWordCount = await _dbContext.VocabItems.CountAsync(cancellationToken);
-            if (learnedWordCount >= 100)
-            {
-                Unlock("hundred_words");
-            }
+        // Stable per-key id so ledger idempotency works without a Guid lesson primary key.
+        private static Guid DeterministicGuid(string value)
+        {
+            var hash = MD5.HashData(Encoding.UTF8.GetBytes(value));
+            return new Guid(hash);
         }
     }
 }

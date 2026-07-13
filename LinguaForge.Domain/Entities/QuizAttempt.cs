@@ -4,6 +4,7 @@ namespace LinguaForge.Domain.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; }
+        public Guid? ExerciseId { get; set; }
         public string LessonKey { get; set; } = string.Empty;
         public string Topic { get; set; } = string.Empty;
         public string ExerciseType { get; set; } = string.Empty;

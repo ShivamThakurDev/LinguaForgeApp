@@ -1,11 +1,15 @@
 using LinguaForge.Application.DTOs;
 using LinguaForge.Application.UseCaseServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LinguaForge.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
+    [Authorize]
+    [EnableRateLimiting("MeteredApi")]
     public class TranslationController : ControllerBase
     {
         private readonly TranslationAppService _service;
@@ -52,7 +56,7 @@ namespace LinguaForge.API.Controllers
         {
             try
             {
-                // Route through the app service or call directly — 
+                // Route through the app service or call directly ï¿½ 
                 // this is read-only infrastructure, no business logic needed
                 var languages = await _service.GetSupportedLanguagesAsync();
                 return Ok(languages);
